@@ -191,3 +191,11 @@ def dbg_hook(hook, x):
         return x
     else:
         return theano.printing.Print(global_fn=hook)(x)
+
+
+def downgrade_pickle():
+    import pickle
+    for f_name in ["ivocab.diag.pkl", "ivocab.drug.pkl", "vocab.drug.pkl", "vocab.diag.pkl"]:
+        data = pickle.load(open(f_name, "rb"))
+        with open(f_name, "wb") as f_out:
+            pickle.dump(data, f_out, protocol=2)
