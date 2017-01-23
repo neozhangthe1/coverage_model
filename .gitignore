@@ -110,3 +110,4 @@ target/
 *.h5
 *.bak
 *.txt
+*.npz
