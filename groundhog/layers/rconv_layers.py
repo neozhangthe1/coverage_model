@@ -21,7 +21,7 @@ from groundhog.utils import sample_weights, \
         init_bias, \
         constant_shape, \
         sample_zeros
-from basic import Layer
+from .basic import Layer
 
 
 class RecursiveConvolutionalLayer(Layer):
@@ -113,11 +113,11 @@ class RecursiveConvolutionalLayer(Layer):
         """
         self.grad_scale = grad_scale
 
-        if type(init_fn) is str or type(init_fn) is unicode:
+        if type(init_fn) is str or type(init_fn) is str:
             init_fn = eval(init_fn)
-        if type(bias_fn) is str or type(bias_fn) is unicode:
+        if type(bias_fn) is str or type(bias_fn) is str:
             bias_fn = eval(bias_fn)
-        if type(activation) is str or type(activation) is unicode:
+        if type(activation) is str or type(activation) is str:
             activation = eval(activation)
 
         self.scale = scale

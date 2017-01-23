@@ -16,7 +16,7 @@ import copy
 import logging
 
 import threading
-import Queue
+import queue
 
 import collections
 
@@ -102,7 +102,7 @@ class TMIterator(object):
     def reset(self):
         self.offset = 0
 
-    def next(self):
+    def __next__(self):
         if self.stop != -1 and self.offset >= self.stop:
             self.offset = 0
             raise StopIteration
@@ -143,7 +143,7 @@ class TMIterator(object):
                         sents = sents.T
                     target_data.append(sents)
                 if inc_offset > self.data_len and self.use_infinite_loop:
-                    print "Restarting the dataset iterator."
+                    print("Restarting the dataset iterator.")
                     inc_offset = 0 #self.offset + self.batch_size
                 elif inc_offset > self.data_len:
                     self.offset = 0
@@ -252,7 +252,7 @@ class PytablesBitextIterator(object):
         self.exit_flag = False
 
     def start(self, start_offset):
-        self.queue = Queue.Queue(maxsize=self.queue_size)
+        self.queue = queue.Queue(maxsize=self.queue_size)
         self.gather = PytablesBitextFetcher(self, start_offset)
         self.gather.daemon = True
         self.gather.start()
@@ -268,7 +268,7 @@ class PytablesBitextIterator(object):
     def __iter__(self):
         return self
 
-    def next(self):
+    def __next__(self):
         batch = self.queue.get()
         if not batch:
             return None
@@ -325,7 +325,7 @@ class NNJMContextIterator(object):
     def reset(self):
         self.offset = 0
 
-    def next(self):
+    def __next__(self):
         if self.stop != -1 and self.offset >= self.stop:
             self.offset = 0
             raise StopIteration
@@ -333,7 +333,7 @@ class NNJMContextIterator(object):
             while True:
                 inc_offset = self.offset + self.batch_size
                 if inc_offset > self.data_len and self.use_infinite_loop:
-                    print "Restarting the dataset iterator."
+                    print("Restarting the dataset iterator.")
                     inc_offset = 0
                 elif inc_offset > self.data_len:
                     self.offset = 0

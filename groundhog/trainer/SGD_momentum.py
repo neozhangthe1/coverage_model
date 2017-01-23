@@ -64,13 +64,13 @@ class SGD(object):
                                                 dtype=x.dtype),
                                     name=x.name) for x in model.inputs]
 
-	if 'profile' not in self.state:
+        if 'profile' not in self.state:
             self.state['profile'] = 0
 
         ###################################
         # Step 1. Compile training function
         ###################################
-        print 'Constructing grad function'
+        print('Constructing grad function')
         loc_data = self.gdata
         lr = TT.scalar('lr')
         self.prop_exprs = [x[1] for x in model.properties]
@@ -78,7 +78,7 @@ class SGD(object):
         self.update_rules = [x[1] for x in model.updates]
         rval = theano.clone(model.param_grads + self.update_rules + \
                             self.prop_exprs + [model.train_cost],
-                            replace=zip(model.inputs, loc_data))
+                            replace=list(zip(model.inputs, loc_data)))
         nparams = len(model.params)
         nouts = len(self.prop_exprs)
         nrules = len(self.update_rules)
@@ -111,14 +111,14 @@ class SGD(object):
 
         store_gs = [(s,g) for s,g in zip(self.gs, gs)]
         updates = store_gs + [(s[0], r) for s,r in zip(model.updates, rules)]
-        print 'Compiling grad function'
+        print('Compiling grad function')
         st = time.time()
         self.train_fn = theano.function(
             [], outs, name='train_function',
             updates = updates,
-            givens = zip(model.inputs, loc_data),
+            givens = list(zip(model.inputs, loc_data)),
             profile=self.state['profile'])
-        print 'took', time.time() - st
+        print('took', time.time() - st)
 
 
         self.lr = numpy.float32(state['lr'])
@@ -127,7 +127,7 @@ class SGD(object):
         self.update_fn = theano.function(
             [lr], [], name='update_function',
             allow_input_downcast=True,
-            updates = zip(model.params, new_params),
+            updates = list(zip(model.params, new_params)),
             profile=self.state['profile'])
 
         self.old_cost = 1e20
@@ -140,7 +140,7 @@ class SGD(object):
 
 
     def __call__(self):
-        batch = self.data.next()
+        batch = next(self.data)
         # Perturb the data (! and the model)
         if isinstance(batch, dict):
             batch = self.model.perturb(**batch)
@@ -176,10 +176,10 @@ class SGD(object):
             vals += [print_time(g_ed - g_st),
                      print_time(time.time() - self.step_timer),
                      float(self.lr)]
-            print msg % tuple(vals)
+            print(msg % tuple(vals))
         self.step += 1
         ret = dict([('cost', float(cost)),
                        ('lr', float(self.lr)),
                        ('time_step', float(g_ed - g_st)),
-                       ('whole_time', float(whole_time))]+zip(self.prop_names, rvals))
+                       ('whole_time', float(whole_time))]+list(zip(self.prop_names, rvals)))
         return ret
