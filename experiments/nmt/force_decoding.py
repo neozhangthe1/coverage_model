@@ -199,8 +199,8 @@ def main():
     beam_search = BeamSearch(enc_dec)
     beam_search.compile()
 
-    idict_src = pickle.load(open(state['indx_word'],'r'))
-    t_idict_src = pickle.load(open(state['indx_word_target'],'r'))
+    idict_src = pickle.load(open(state['indx_word'],'rb'))
+    t_idict_src = pickle.load(open(state['indx_word_target'],'rb'))
 
 
     fsrc = open(args.source, 'r')

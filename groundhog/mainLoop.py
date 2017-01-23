@@ -232,7 +232,7 @@ class MainLoop(object):
         else:
             self.model.save(self.state['prefix'] +
                             'model%d.npz' % self.save_iter)
-        pickle.dump(self.state, open(self.state['prefix']+'state.pkl', 'w'))
+        pickle.dump(self.state, open(self.state['prefix']+'state.pkl', 'wb'))
         self.save_iter += 1
         signal.signal(signal.SIGINT, s)
 

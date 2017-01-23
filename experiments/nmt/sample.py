@@ -320,7 +320,7 @@ def main():
     else:
         sampler = enc_dec.create_sampler(many_samples=True)
 
-    idict_src = pickle.load(open(state['indx_word'],'r'))
+    idict_src = pickle.load(open(state['indx_word'],'rb'))
 
     if args.source and args.trans:
         # Actually only beam search is currently supported here
