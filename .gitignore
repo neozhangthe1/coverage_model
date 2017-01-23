@@ -108,3 +108,5 @@ target/
 
 *.pkl
 *.h5
+*.bak
+*.txt
