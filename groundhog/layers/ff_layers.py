@@ -22,7 +22,7 @@ from groundhog.utils import sample_weights, \
             init_bias, \
             constant_shape, \
             sample_zeros
-from basic import Layer
+from .basic import Layer
 
 
 class MultiLayer(Layer):
@@ -129,7 +129,7 @@ class MultiLayer(Layer):
         assert rank_n_approx >= 0, "Please enter a valid rank_n_approx"
         self.rank_n_approx = rank_n_approx
 
-        if isinstance(rank_n_activ,  (str, unicode)):
+        if isinstance(rank_n_activ,  str):
             rank_n_activ = eval(rank_n_activ)
         self.rank_n_activ = rank_n_activ
         if type(n_hids) not in (list, tuple):
@@ -151,12 +151,12 @@ class MultiLayer(Layer):
         if init_fn not in (list, tuple):
             init_fn = [init_fn] * n_layers
 
-        for dx in xrange(n_layers):
-            if isinstance(bias_fn[dx],  (str, unicode)):
+        for dx in range(n_layers):
+            if isinstance(bias_fn[dx],  str):
                 bias_fn[dx] = eval(bias_fn[dx])
-            if isinstance(init_fn[dx], (str, unicode)):
+            if isinstance(init_fn[dx], str):
                 init_fn[dx] = eval(init_fn[dx])
-            if isinstance(activation[dx], (str, unicode)):
+            if isinstance(activation[dx], str):
                 activation[dx] = eval(activation[dx])
         super(MultiLayer, self).__init__(n_in, n_hids[-1], rng, name)
         self.trng = RandomStreams(self.rng.randint(int(1e6)))
@@ -212,7 +212,7 @@ class MultiLayer(Layer):
             name='b_0_%s'%self.name)
         self.b_ems = [self.b_em]
 
-        for dx in xrange(1, self.n_layers):
+        for dx in range(1, self.n_layers):
             W_em = self.init_fn[dx](self.n_hids[dx-1] / self.pieces[dx],
                                 self.n_hids[dx],
                                 self.sparsity[dx],
@@ -285,7 +285,7 @@ class MultiLayer(Layer):
                 emb_val = emb_val * self.trng.binomial(emb_val.shape, n=1, p=self.dropout, dtype=emb_val.dtype)
             else:
                 emb_val = emb_val * self.dropout
-        for dx in xrange(1, self.n_layers):
+        for dx in range(1, self.n_layers):
             emb_val = utils.dot(emb_val, W_ems[st_pos+dx])
             if b_ems:
                 emb_val = self.activation[dx](emb_val+ b_ems[dx])
@@ -323,7 +323,7 @@ class LastState(Layer):
             shape0 = TT.switch(TT.gt(self.n, 0), self.n, all_states.shape[0])
 
             single_frame = TT.shape_padleft(all_states[stateshape0-1])
-            mask = TT.alloc(numpy.float32(1), shape0, *[1 for k in xrange(all_states.ndim-1)])
+            mask = TT.alloc(numpy.float32(1), shape0, *[1 for k in range(all_states.ndim-1)])
             rval = single_frame * mask
             self.out = rval
             return rval
@@ -464,7 +464,7 @@ class MinPooling(Layer):
         if self.ntimes:
             single_frame = TT.shape_padleft(all_states.max(0))
             mask = TT.alloc(numpy.float32(1),
-                        shape0, *[1 for k in xrange(all_states.ndim-1)])
+                        shape0, *[1 for k in range(all_states.ndim-1)])
             rval = single_frame * mask
             self.out = rval
             return rval
@@ -490,7 +490,7 @@ class MaxPooling(Layer):
         if self.ntimes:
             single_frame = TT.shape_padleft(all_states.max(0))
             mask = TT.alloc(numpy.float32(1),
-                        shape0, *[1 for k in xrange(all_states.ndim-1)])
+                        shape0, *[1 for k in range(all_states.ndim-1)])
             rval = single_frame * mask
             self.out = rval
             return rval

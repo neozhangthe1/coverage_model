@@ -43,11 +43,11 @@ if __name__ == "__main__":
     datas = [load_timings(path, args, y) for path,y in zip(args.timings,args.y)]
     for path, y, data in zip(args.timings, args.y, datas):
         pyplot.plot(data.index, data[y])
-        print "Average {} is {} after {} {} for {}".format(
+        print("Average {} is {} after {} {} for {}".format(
                 y, data[y].iloc[-1],
-                data.index[-1], "hours" if args.hours else "iterations", path)
+                data.index[-1], "hours" if args.hours else "iterations", path))
 
     pyplot.xlabel("hours" if args.hours else "iterations")
     pyplot.ylabel("log_2 likelihood")
-    pyplot.legend(args.legend.split(",") if args.legend else range(len(datas)))
+    pyplot.legend(args.legend.split(",") if args.legend else list(range(len(datas))))
     pyplot.savefig(args.plot_path)

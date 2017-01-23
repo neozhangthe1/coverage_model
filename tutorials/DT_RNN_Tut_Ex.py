@@ -307,13 +307,13 @@ def jobman(state, channel):
         dictionary = dictionary['unique_words']
     def hook_fn():
         sample = sample_fn()[0]
-        print 'Sample:',
+        print('Sample:', end=' ')
         if state['chunks'] == 'chars':
-            print "".join(dictionary[sample])
+            print("".join(dictionary[sample]))
         else:
             for si in sample:
-                print dictionary[si],
-            print
+                print(dictionary[si], end=' ')
+            print()
 
     ### Build and Train a Model
     #### Define a model

@@ -15,7 +15,7 @@ import numpy
 import itertools
 import logging
 
-import cPickle as pkl
+import pickle as pkl
 
 import theano
 import theano.tensor as TT
@@ -182,7 +182,7 @@ class LM_Model(Model):
             n_batches += 1
 
             if isinstance(vals, dict):
-                val = vals.values()[0]
+                val = list(vals.values())[0]
                 if val.ndim ==3:
                     n_steps += val.shape[0]*val.shape[1]
                 else:
@@ -219,7 +219,7 @@ class LM_Model(Model):
         """
 
         if self.indx_word and '.pkl' in self.indx_word[-4:]:
-            data_dict = pkl.load(open(self.indx_word, "r"))
+            data_dict = pkl.load(open(self.indx_word, "rb"))
             self.word_indxs = data_dict
             self.word_indxs[opts['null_sym_target']] = '<eol>'
             self.word_indxs[opts['unk_sym_target']] = opts['oov']
@@ -227,7 +227,7 @@ class LM_Model(Model):
             self.word_indxs = numpy.load(self.indx_word)['unique_words']
 
         if self.indx_word_src and '.pkl' in self.indx_word_src[-4:]:
-            data_dict = pkl.load(open(self.indx_word_src, "r"))
+            data_dict = pkl.load(open(self.indx_word_src, "rb"))
             self.word_indxs_src = data_dict
             self.word_indxs_src[opts['null_sym_source']] = '<eol>'
             self.word_indxs_src[opts['unk_sym_source']] = opts['oov']
