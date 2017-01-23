@@ -685,37 +685,38 @@ class SigmoidLayer(CostLayer):
         if values.ndim > 1:
             for d in range(2):
                 print('%d-th sentence' % d)
-                print('Input: ', end=' ')
+                print('Input: ')
+
                 if character_level:
                     sen = []
                     for k in range(inps[0].shape[0]):
                         if model.word_indxs_src[inps[0][k][d]] == '<eol>':
                             break
                         sen.append(model.word_indxs_src[inps[0][k][d]])
-                    print("".join(sen), end=' ')
+                    print("".join(sen))
                 else:
                     for k in range(inps[0].shape[0]):
-                        print(model.word_indxs_src[inps[0][k][d]], end=' ')
+                        print(model.word_indxs_src[inps[0][k][d]])
                         if model.word_indxs_src[inps[0][k][d]] == '<eol>':
                             break
                 print('')
-                print('Output: ', end=' ')
+                print('Output: ')
                 if character_level:
                     sen = []
                     for k in range(values.shape[0]):
                         if model.word_indxs[values[k][d]] == '<eol>':
                             break
                         sen.append(model.word_indxs[values[k][d]])
-                    print("".join(sen), end=' ')
+                    print("".join(sen))
                 else:
                     for k in range(values.shape[0]):
-                        print(model.word_indxs[values[k][d]], end=' ')
+                        print(model.word_indxs[values[k][d]])
                         if model.word_indxs[values[k][d]] == '<eol>':
                             break
                 print()
                 print()
         else:
-            print('Output: ', end=' ')
+            print('Output: ')
             coverage_step = 0
             if character_level:
                 sen = []
@@ -724,43 +725,43 @@ class SigmoidLayer(CostLayer):
                         coverage_step = k
                         break
                     sen.append(model.word_indxs[values[k]])
-                print("".join(sen), end=' ')
+                print("".join(sen))
             else:
                 for k in range(values.shape[0]):
-                    print(model.word_indxs[values[k]], end=' ')
+                    print(model.word_indxs[values[k]])
                     if model.word_indxs[values[k]] == '<eol>':
                         coverage_step = k
                         break
             print()
             if model.maintain_coverage and model.coverage_dim == 1:
                 coverage = coverages[coverage_step]
-                print('Coverage:  ', end=' ')
+                print('Coverage:  ')
                 if character_level:
                     sen = []
                     for k in range(inps[0].shape[0]):
                         if model.word_indxs_src[inps[0][k]] == '<eol>':
                             break
                         sen.append('%s/%.2f'%(model.word_indxs_src[inps[0][k]], coverage[k]))
-                    print("".join(sen), end=' ')
+                    print("".join(sen))
                 else:
                     for k in range(inps[0].shape[0]):
-                        print('%s/%.2f'%(model.word_indxs_src[inps[0][k]], coverage[k]), end=' ')
+                        print('%s/%.2f'%(model.word_indxs_src[inps[0][k]], coverage[k]))
                         if model.word_indxs_src[inps[0][k]] == '<eol>':
                             break
                 print('')
                 if model.use_linguistic_coverage and model.use_fertility_model:
                     [values, probs, coverages, fertility] = model.sample_fn(length, temp, *inps)
-                    print('Fertility:  ', end=' ')
+                    print('Fertility:  ')
                     if character_level:
                         sen = []
                         for k in range(inps[0].shape[0]):
                             if model.word_indxs_src[inps[0][k]] == '<eol>':
                                 break
                             sen.append('%s/%.2f'%(model.word_indxs_src[inps[0][k]], fertility[k]))
-                        print("".join(sen), end=' ')
+                        print("".join(sen))
                     else:
                         for k in range(inps[0].shape[0]):
-                            print('%s/%.2f'%(model.word_indxs_src[inps[0][k]], fertility[k]), end=' ')
+                            print('%s/%.2f'%(model.word_indxs_src[inps[0][k]], fertility[k]))
                             if model.word_indxs_src[inps[0][k]] == '<eol>':
                                 break
                     print('')
@@ -934,37 +935,37 @@ class SoftmaxLayer(CostLayer):
         if values.ndim > 1:
             for d in range(2):
                 print('%d-th sentence' % d)
-                print('Input: ', end=' ')
+                print('Input: ')
                 if character_level:
                     sen = []
                     for k in range(inps[0].shape[0]):
                         if model.word_indxs_src[inps[0][k][d]] == '<eol>':
                             break
                         sen.append(model.word_indxs_src[inps[0][k][d]])
-                    print("".join(sen), end=' ')
+                    print("".join(sen))
                 else:
                     for k in range(inps[0].shape[0]):
-                        print(model.word_indxs_src[inps[0][k][d]], end=' ')
+                        print(model.word_indxs_src[inps[0][k][d]])
                         if model.word_indxs_src[inps[0][k][d]] == '<eol>':
                             break
                 print('')
-                print('Output: ', end=' ')
+                print('Output: ')
                 if character_level:
                     sen = []
                     for k in range(values.shape[0]):
                         if model.word_indxs[values[k][d]] == '<eol>':
                             break
                         sen.append(model.word_indxs[values[k][d]])
-                    print("".join(sen), end=' ')
+                    print("".join(sen))
                 else:
                     for k in range(values.shape[0]):
-                        print(model.word_indxs[values[k][d]], end=' ')
+                        print(model.word_indxs[values[k][d]])
                         if model.word_indxs[values[k][d]] == '<eol>':
                             break
                 print()
                 print()
         else:
-            print('Output: ', end=' ')
+            print('Output: ')
             coverage_step = 0
             if character_level:
                 sen = []
@@ -973,42 +974,42 @@ class SoftmaxLayer(CostLayer):
                         coverage_step = k
                         break
                     sen.append(model.word_indxs[values[k]])
-                print("".join(sen), end=' ')
+                print("".join(sen))
             else:
                 for k in range(values.shape[0]):
-                    print(model.word_indxs[values[k]], end=' ')
+                    print(model.word_indxs[values[k]])
                     if model.word_indxs[values[k]] == '<eol>':
                         coverage_step = k
                         break
             print()
             if model.maintain_coverage and model.coverage_dim == 1:
                 coverage = coverages[coverage_step]
-                print('Coverage:  ', end=' ')
+                print('Coverage:  ')
                 if character_level:
                     sen = []
                     for k in range(inps[0].shape[0]):
                         if model.word_indxs_src[inps[0][k]] == '<eol>':
                             break
                         sen.append('%s/%.2f'%(model.word_indxs_src[inps[0][k]], coverage[k]))
-                    print("".join(sen), end=' ')
+                    print("".join(sen))
                 else:
                     for k in range(inps[0].shape[0]):
-                        print('%s/%.2f'%(model.word_indxs_src[inps[0][k]], coverage[k]), end=' ')
+                        print('%s/%.2f'%(model.word_indxs_src[inps[0][k]], coverage[k]))
                         if model.word_indxs_src[inps[0][k]] == '<eol>':
                             break
                 print('')
                 if model.use_linguistic_coverage and model.use_fertility_model:
-                    print('Fertility:  ', end=' ')
+                    print('Fertility:  ')
                     if character_level:
                         sen = []
                         for k in range(inps[0].shape[0]):
                             if model.word_indxs_src[inps[0][k]] == '<eol>':
                                 break
                             sen.append('%s/%.2f'%(model.word_indxs_src[inps[0][k]], fertility[k]))
-                        print("".join(sen), end=' ')
+                        print("".join(sen))
                     else:
                         for k in range(inps[0].shape[0]):
-                            print('%s/%.2f'%(model.word_indxs_src[inps[0][k]], fertility[k]), end=' ')
+                            print('%s/%.2f'%(model.word_indxs_src[inps[0][k]], fertility[k]))
                             if model.word_indxs_src[inps[0][k]] == '<eol>':
                                 break
                     print('')
