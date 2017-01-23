@@ -111,3 +111,4 @@ target/
 *.bak
 *.txt
 *.npz
+*.pyc
