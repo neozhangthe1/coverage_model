@@ -15,7 +15,7 @@ import numpy
 import itertools
 import logging
 
-import cPickle as pkl
+import pickle as pkl
 
 import theano
 import theano.tensor as TT
@@ -182,7 +182,7 @@ class LM_Model(Model):
             n_batches += 1
 
             if isinstance(vals, dict):
-                val = vals.values()[0]
+                val = list(vals.values())[0]
                 if val.ndim ==3:
                     n_steps += val.shape[0]*val.shape[1]
                 else:

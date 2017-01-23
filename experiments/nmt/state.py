@@ -253,19 +253,19 @@ def prototype_encdec_state():
 
     state = prototype_state()
 
-    state['target'] = ["/data/lisatmp3/chokyun/mt/vocab.unlimited/bitexts.selected/binarized_text.shuffled.fr.h5"]
-    state['source'] = ["/data/lisatmp3/chokyun/mt/vocab.unlimited/bitexts.selected/binarized_text.shuffled.en.h5"]
-    state['indx_word'] = "/data/lisatmp3/chokyun/mt/vocab.unlimited/bitexts.selected/ivocab.en.pkl"
-    state['indx_word_target'] = "/data/lisatmp3/chokyun/mt/vocab.unlimited/bitexts.selected/ivocab.fr.pkl"
-    state['word_indx'] = "/data/lisatmp3/chokyun/mt/vocab.unlimited/bitexts.selected/vocab.en.pkl"
-    state['word_indx_trgt'] = "/data/lisatmp3/chokyun/mt/vocab.unlimited/bitexts.selected/vocab.fr.pkl"
+    state['target'] = ["/home/yzhang3151/project/NMT/experiments/nmt/binarized_text.drug.shuf.h5"]
+    state['source'] = ["/home/yzhang3151/project/NMT/experiments/nmt/binarized_text.diag.shuf.h5"]
+    state['indx_word'] = "/home/yzhang3151/project/NMT/experiments/nmt/ivocab.diag.pkl"
+    state['indx_word_target'] = "/home/yzhang3151/project/NMT/experiments/nmt/ivocab.drug.pkl"
+    state['word_indx'] = "/home/yzhang3151/project/NMT/experiments/nmt/vocab.diag.pkl"
+    state['word_indx_trgt'] = "/home/yzhang3151/project/NMT/experiments/nmt/vocab.drug.pkl"
 
-    state['null_sym_source'] = 30000
-    state['null_sym_target'] = 30000
+    state['null_sym_source'] = 8360
+    state['null_sym_target'] = 1010
     state['n_sym_source'] = state['null_sym_source'] + 1
     state['n_sym_target'] = state['null_sym_target'] + 1
 
-    state['seqlen'] = 30
+    state['seqlen'] = 10
     state['bs']  = 80
 
     state['dim'] = 1000

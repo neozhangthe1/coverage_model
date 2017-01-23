@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
-import cPickle
+import pickle
 import traceback
 import logging
 import time
@@ -52,7 +52,7 @@ class BeamSearch(object):
 
     def search(self, seq, out, ignore_unk=False, minlen=1):
         c = self.comp_repr(seq)[0]
-        states = map(lambda x : x[None, :], self.comp_init_states(c))
+        states = [x[None, :] for x in self.comp_init_states(c)]
         dim = states[0].shape[1]
         # added by Zhaopeng Tu, 2015-11-02
         if self.enc_dec.state['maintain_coverage']:
@@ -118,7 +118,7 @@ class BeamSearch(object):
 
 def indices_to_words(i2w, seq):
     sen = []
-    for k in xrange(len(seq)):
+    for k in range(len(seq)):
         if i2w[seq[k]] == '<eol>':
             break
         sen.append(i2w[seq[k]])
@@ -182,7 +182,7 @@ def main():
 
     state = prototype_search_with_coverage_state()
     with open(args.state) as src:
-        state.update(cPickle.load(src))
+        state.update(pickle.load(src))
     state.update(eval("dict({})".format(args.changes)))
 
     logging.basicConfig(level=getattr(logging, state['level']), format="%(asctime)s: %(name)s: %(levelname)s: %(message)s")
@@ -192,15 +192,15 @@ def main():
     enc_dec.build()
     lm_model = enc_dec.create_lm_model()
     lm_model.load(args.model_path)
-    indx_word = cPickle.load(open(state['word_indx'],'rb'))
-    t_indx_word = cPickle.load(open(state['word_indx_trgt'], 'rb'))
+    indx_word = pickle.load(open(state['word_indx'],'rb'))
+    t_indx_word = pickle.load(open(state['word_indx_trgt'], 'rb'))
 
     sampler = None
     beam_search = BeamSearch(enc_dec)
     beam_search.compile()
 
-    idict_src = cPickle.load(open(state['indx_word'],'r'))
-    t_idict_src = cPickle.load(open(state['indx_word_target'],'r'))
+    idict_src = pickle.load(open(state['indx_word'],'r'))
+    t_idict_src = pickle.load(open(state['indx_word_target'],'r'))
 
 
     fsrc = open(args.source, 'r')
@@ -232,32 +232,32 @@ def main():
             aligns, costs = force_decoding(lm_model, seq, out, sampler=sampler,
                     beam_search=beam_search, ignore_unk=args.ignore_unk, normalize=args.normalize)
         
-        print "Parsed Input:", parsed_in
-        print "Parsed Target:", parsed_out
-        print 'Aligns:'
-        print aligns.tolist()
+        print("Parsed Input:", parsed_in)
+        print("Parsed Target:", parsed_out)
+        print('Aligns:')
+        print(aligns.tolist())
 
 
         if lm_model.maintain_coverage:
             # since we filtered <eos> from trans[best], thus the index adds 1
-            print "Coverage:", 
+            print("Coverage:", end=' ') 
             words = parsed_in.split()
-            for k in xrange(len(words)):
-                print '%s/%.2f'%(words[k], coverage[k]),
-            print ''
+            for k in range(len(words)):
+                print('%s/%.2f'%(words[k], coverage[k]), end=' ')
+            print('')
 
             if lm_model.use_linguistic_coverage and lm_model.use_fertility_model:
-                print 'Fertility:  ',
-                for k in xrange(len(words)):
-                    print '%s/%.2f'%(words[k], fertility[k]),
-                print ''
-        print 
+                print('Fertility:  ', end=' ')
+                for k in range(len(words)):
+                    print('%s/%.2f'%(words[k], fertility[k]), end=' ')
+                print('')
+        print() 
 
         total_cost += costs[0]
         if (i + 1)  % 100 == 0:
             logger.debug("Current speed is {} per sentence".
                     format((time.time() - start_time) / (i + 1)))
-    print "Total cost of the translations: {}".format(total_cost)
+    print("Total cost of the translations: {}".format(total_cost))
 
     fsrc.close()
     ftrg.close()

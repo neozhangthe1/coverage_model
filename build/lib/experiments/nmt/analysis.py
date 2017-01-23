@@ -11,7 +11,7 @@ def load_timings(path, y="cost2_p_expl", start=0, finish=3000000, window=100, ho
     num_steps = min(tm['step'], finish)
     df = pandas.DataFrame({k : tm[k] for k in [y, 'time_step']})[start:num_steps]
     one_step = df['time_step'][-window:].median() / 3600.0
-    print "Median time for one step is {} hours".format(one_step)
+    print("Median time for one step is {} hours".format(one_step))
     if hours:
         df.index = (start + numpy.arange(0, df.index.shape[0])) * one_step
     return pandas.rolling_mean(df, window).iloc[window:]
@@ -19,9 +19,9 @@ def load_timings(path, y="cost2_p_expl", start=0, finish=3000000, window=100, ho
 def show_timings(axes, timings, legend, y="cost2_p_expl", hours=False):
     for data, name in zip(timings, legend):
         axes.plot(data.index, data[y])
-        print "Average {} is {} after {} {} for {}".format(
+        print("Average {} is {} after {} {} for {}".format(
                 y, data[y].iloc[-1],
-                data.index[-1], "hours" if hours else "iterations", name)
+                data.index[-1], "hours" if hours else "iterations", name))
     #axes.set_ylim(0, 20)
     axes.set_xlabel("hours" if hours else "iterations")
     axes.set_ylabel("log_2 likelihood")
@@ -36,9 +36,9 @@ def load_n_show_timings(axes, timings, legend, **kwargs):
 def bleu_stats(hypothesis, reference):
     yield len(hypothesis)
     yield len(reference)
-    for n in xrange(1, 5):
-        s_ngrams = Counter([tuple(hypothesis[i:i + n]) for i in xrange(len(hypothesis) + 1 - n)])
-        r_ngrams = Counter([tuple(reference[i:i + n]) for i in xrange(len(reference) + 1 - n)])
+    for n in range(1, 5):
+        s_ngrams = Counter([tuple(hypothesis[i:i + n]) for i in range(len(hypothesis) + 1 - n)])
+        r_ngrams = Counter([tuple(reference[i:i + n]) for i in range(len(reference) + 1 - n)])
         yield sum((s_ngrams & r_ngrams).values())
         yield max(len(hypothesis) + 1 - n, 0)
 

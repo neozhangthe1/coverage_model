@@ -19,7 +19,7 @@ def plain2sgm(trg_plain, src_sgm, trg_sgm):
     doc_head = fin_src_sgm.readline().rstrip().replace("srcset", "tstset")
     if doc_head.find("trglang") == -1 :
         doc_head = doc_head.replace(">", " trglang=\"English\">")
-    print >> fout, doc_head
+    print(doc_head, file=fout)
 
     for line in fin_src_sgm:
         line = line.rstrip()
@@ -28,20 +28,20 @@ def plain2sgm(trg_plain, src_sgm, trg_sgm):
             p1 = line.find('"')
             p2 = line.find('"' , p1+1)
             id = line[p1+1 : p2]
-            print >> fout, '''<doc docid="%s" sysid="hiero">''' %id
+            print('''<doc docid="%s" sysid="hiero">''' %id, file=fout)
         elif line.startswith("<seg"):
             head, body , tail  = split_seg(line)
-            print >> fout, head, fin_trg_plain.readline().rstrip(), tail
+            print(head, fin_trg_plain.readline().rstrip(), tail, file=fout)
         elif line.strip() == "</srcset>":
-            print >> fout, "</tstset>"
+            print("</tstset>", file=fout)
         else:
-            print >> fout, line
+            print(line, file=fout)
     
 
 
 if __name__ == "__main__" :
     if (len(sys.argv) != 4) :
-        print >> sys.stderr, "exe trg_plain src_sgm out_sgm"
+        print("exe trg_plain src_sgm out_sgm", file=sys.stderr)
         sys.exit(0)
 
     trg_plain = sys.argv[1]

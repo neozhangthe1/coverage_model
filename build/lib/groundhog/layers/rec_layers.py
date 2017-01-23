@@ -25,7 +25,7 @@ from groundhog.utils import sample_weights, \
         init_bias, \
         constant_shape, \
         sample_zeros
-from basic import Layer
+from .basic import Layer
 
 class RecurrentMultiLayer(Layer):
     """
@@ -131,13 +131,13 @@ class RecurrentMultiLayer(Layer):
         if type(init_fn) not in (list, tuple):
             init_fn = [init_fn] * n_layers
 
-        for dx in xrange(n_layers):
+        for dx in range(n_layers):
             if dx < n_layers-1:
-                if type(bias_fn[dx]) is str or type(bias_fn[dx]) is unicode:
+                if type(bias_fn[dx]) is str or type(bias_fn[dx]) is str:
                     bias_fn[dx] = eval(bias_fn[dx])
-            if type(init_fn[dx]) is str or type(init_fn[dx]) is unicode:
+            if type(init_fn[dx]) is str or type(init_fn[dx]) is str:
                 init_fn[dx] = eval(init_fn[dx])
-            if type(activation[dx]) is str or type(activation[dx]) is unicode:
+            if type(activation[dx]) is str or type(activation[dx]) is str:
                 activation[dx] = eval(activation[dx])
         self.scale = scale
         self.n_layers = n_layers
@@ -164,7 +164,7 @@ class RecurrentMultiLayer(Layer):
     def _init_params(self):
         self.W_hhs = []
         self.b_hhs = []
-        for dx in xrange(self.n_layers):
+        for dx in range(self.n_layers):
             W_hh = self.init_fn[dx](self.n_hids[(dx-1)%self.n_layers],
                                         self.n_hids[dx],
                                         self.sparsity[dx],
@@ -245,7 +245,7 @@ class RecurrentMultiLayer(Layer):
                 h = h * self.dropout
 
         rval +=[h]
-        for dx in xrange(1, self.n_layers):
+        for dx in range(1, self.n_layers):
             preactiv = TT.dot(h, W_hhs[dx]) + b_hhs[dx-1]
             h = self.activation[dx](preactiv)
 
@@ -389,7 +389,7 @@ class RecurrentMultiLayerInp(RecurrentMultiLayer):
     def _init_params(self):
         self.W_hhs = []
         self.b_hhs = []
-        for dx in xrange(self.n_layers):
+        for dx in range(self.n_layers):
             W_hh = self.init_fn[dx](self.n_hids[(dx-1)%self.n_layers],
                                         self.n_hids[dx],
                                         self.sparsity[dx],
@@ -452,7 +452,7 @@ class RecurrentMultiLayerInp(RecurrentMultiLayer):
                 h = h * self.dropout
 
         rval += [h]
-        for dx in xrange(1, self.n_layers-1):
+        for dx in range(1, self.n_layers-1):
             h = self.activation[dx](TT.dot(h,
                                            W_hhs[dx])+b_hhs[dx])
             if self.activ_noise and use_noise:
@@ -499,7 +499,7 @@ class RecurrentMultiLayerShortPath(RecurrentMultiLayer):
         self.W_hhs = []
         self.b_hhs = []
         self.W_shortp = []
-        for dx in xrange(self.n_layers):
+        for dx in range(self.n_layers):
             W_hh = self.init_fn[dx](self.n_hids[(dx-1)%self.n_layers],
                                     self.n_hids[dx],
                                     self.sparsity[dx],
@@ -572,7 +572,7 @@ class RecurrentMultiLayerShortPath(RecurrentMultiLayer):
             else:
                 h = h * self.dropout
         rval += [h]
-        for dx in xrange(1, self.n_layers):
+        for dx in range(1, self.n_layers):
             h = self.activation[dx](TT.dot(h,
                                            W_hhs[dx])+
                                     TT.dot(state_before,
@@ -609,7 +609,7 @@ class RecurrentMultiLayerShortPathInp(RecurrentMultiLayer):
         self.W_hhs = []
         self.b_hhs = []
         self.W_shortp = []
-        for dx in xrange(self.n_layers):
+        for dx in range(self.n_layers):
             W_hh = self.init_fn[dx](self.n_hids[(dx-1)%self.n_layers],
                                         self.n_hids[dx],
                                         self.sparsity[dx],
@@ -683,7 +683,7 @@ class RecurrentMultiLayerShortPathInp(RecurrentMultiLayer):
             else:
                 h = h * self.dropout
         rval += [h]
-        for dx in xrange(1, self.n_layers-1):
+        for dx in range(1, self.n_layers-1):
             h = self.activation[dx](TT.dot(h,
                                            W_hhs[dx])+
                                     TT.dot(state_before,
@@ -734,7 +734,7 @@ class RecurrentMultiLayerShortPathInpAll(RecurrentMultiLayer):
     def _init_params(self):
         self.W_hhs = []
         self.W_shortp = []
-        for dx in xrange(self.n_layers):
+        for dx in range(self.n_layers):
             W_hh = self.init_fn[dx](self.n_hids[(dx-1)%self.n_layers],
                                         self.n_hids[dx],
                                         self.sparsity[dx],
@@ -784,7 +784,7 @@ class RecurrentMultiLayerShortPathInpAll(RecurrentMultiLayer):
             W_shp = self.W_shortp
         def slice_state_below(dx, sb = state_below):
             st = 0
-            for p in xrange(dx):
+            for p in range(dx):
                 st += self.n_hids[p]
             ed = st + self.n_hids[dx]
             if sb.ndim == 1:
@@ -810,7 +810,7 @@ class RecurrentMultiLayerShortPathInpAll(RecurrentMultiLayer):
                 h = h * self.dropout
 
         rval += [h]
-        for dx in xrange(1, self.n_layers):
+        for dx in range(1, self.n_layers):
             h = self.activation[dx](TT.dot(h, W_hhs[dx]) +
                                     TT.dot(state_before, W_shp[dx-1]) +
                                     slice_state_below(dx))
@@ -938,15 +938,15 @@ class RecurrentLayer(Layer):
         """
         self.grad_scale = grad_scale
 
-        if type(init_fn) is str or type(init_fn) is unicode:
+        if type(init_fn) is str or type(init_fn) is str:
             init_fn = eval(init_fn)
-        if type(bias_fn) is str or type(bias_fn) is unicode:
+        if type(bias_fn) is str or type(bias_fn) is str:
             bias_fn = eval(bias_fn)
-        if type(activation) is str or type(activation) is unicode:
+        if type(activation) is str or type(activation) is str:
             activation = eval(activation)
-        if type(gater_activation) is str or type(gater_activation) is unicode:
+        if type(gater_activation) is str or type(gater_activation) is str:
             gater_activation = eval(gater_activation)
-        if type(reseter_activation) is str or type(reseter_activation) is unicode:
+        if type(reseter_activation) is str or type(reseter_activation) is str:
             reseter_activation = eval(reseter_activation)
 
         self.scale = scale
@@ -1277,11 +1277,11 @@ class LSTMLayer(Layer):
         """
         self.grad_scale = grad_scale
 
-        if type(init_fn) is str or type(init_fn) is unicode:
+        if type(init_fn) is str or type(init_fn) is str:
             init_fn = eval(init_fn)
-        if type(bias_fn) is str or type(bias_fn) is unicode:
+        if type(bias_fn) is str or type(bias_fn) is str:
             bias_fn = eval(bias_fn)
-        if type(activation) is str or type(activation) is unicode:
+        if type(activation) is str or type(activation) is str:
             activation = eval(activation)
 
         self.scale = scale

@@ -90,7 +90,7 @@ class SGD(object):
         self.update_rules = [x[1] for x in model.updates]
         rval = theano.clone(model.param_grads + self.update_rules + \
                             self.prop_exprs + [model.train_cost],
-                            replace=zip(model.inputs, loc_data))
+                            replace=list(zip(model.inputs, loc_data)))
         nparams = len(model.params)
         nouts = len(self.prop_exprs)
         nrules = len(self.update_rules)
@@ -123,14 +123,14 @@ class SGD(object):
 
         # grad2
         gnorm2_up = [rho * gn2 + (1. - rho) * (g ** 2.) for gn2,g in zip(self.gnorm2, gs)]
-        updates = updates + zip(self.gnorm2, gnorm2_up)
+        updates = updates + list(zip(self.gnorm2, gnorm2_up))
 
         logger.debug('Compiling grad function')
         st = time.time()
         self.train_fn = theano.function(
             [], outs, name='train_function',
             updates = updates,
-            givens = zip(model.inputs, loc_data))
+            givens = list(zip(model.inputs, loc_data)))
         logger.debug('took {}'.format(time.time() - st))
 
         self.lr = numpy.float32(1.)
@@ -138,7 +138,7 @@ class SGD(object):
                 for p, g, gn2, dn2 in
                 zip(model.params, self.gs, self.gnorm2, self.dnorm2)]
 
-        updates = zip(model.params, new_params)
+        updates = list(zip(model.params, new_params))
         # d2
         d2_up = [(dn2, rho * dn2 + (1. - rho) *
             (((TT.sqrt(dn2 + eps) / TT.sqrt(gn2 + eps)) * g) ** 2.))
@@ -160,7 +160,7 @@ class SGD(object):
         self.prev_batch = None
 
     def __call__(self):
-        batch = self.data.next()
+        batch = next(self.data)
         assert batch
 
         # Perturb the data (! and the model)
@@ -198,11 +198,11 @@ class SGD(object):
             vals += [print_time(g_ed - g_st),
                      print_time(time.time() - self.step_timer),
                      float(self.lr)]
-            print msg % tuple(vals)
+            print(msg % tuple(vals))
         self.step += 1
         ret = dict([('cost', float(cost)),
                     ('error', float(cost)),
                        ('lr', float(self.lr)),
                        ('time_step', float(g_ed - g_st)),
-                       ('whole_time', float(whole_time))]+zip(self.prop_names, rvals))
+                       ('whole_time', float(whole_time))]+list(zip(self.prop_names, rvals)))
         return ret

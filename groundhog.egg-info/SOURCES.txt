@@ -4,6 +4,7 @@ experiments/nmt/__init__.py
 experiments/nmt/data_state.py
 experiments/nmt/encdec.py
 experiments/nmt/force_decoding.py
+experiments/nmt/numpy_compat.py
 experiments/nmt/sample.py
 experiments/nmt/state.py
 experiments/nmt/train.py

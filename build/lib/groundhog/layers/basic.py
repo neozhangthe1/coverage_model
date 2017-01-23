@@ -10,7 +10,7 @@ __contact__ = "Razvan Pascanu <r.pascanu@gmail>"
 
 import numpy
 import copy
-import cPickle as pkl
+import pickle as pkl
 import logging
 
 import theano
@@ -381,9 +381,9 @@ class Layer(Container):
         return new_obj
 
     def _as_TensorVariable(self):
-        print ('WARNING: you might loose track of parameters or inputs '\
+        print(('WARNING: you might loose track of parameters or inputs '\
                'because layer ' + self.name +' is being converted to a '\
-               'theano variable')
+               'theano variable'))
         return self.out
 
 
@@ -401,8 +401,8 @@ class Layer(Container):
         except:
             o_args, o_kwargs = ([], {})
 
-        kwargs = dict([(k, new_obj.tensor_from_layer(v)) for k,v in kwargs.items()])
-        for (k,v) in kwargs.items():
+        kwargs = dict([(k, new_obj.tensor_from_layer(v)) for k,v in list(kwargs.items())])
+        for (k,v) in list(kwargs.items()):
             o_kwargs[k] = v
         new_obj.prev_args = (o_args, o_kwargs)
         new_obj.get_cost(*o_args, **o_kwargs)
@@ -421,8 +421,8 @@ class Layer(Container):
             o_args, o_kwargs = new_obj.prev_args
         except:
             o_args, o_kwargs = ([], {})
-        kwargs = dict([(k, new_obj.tensor_from_layer(v)) for k,v in kwargs.items()])
-        for (k,v) in kwargs.items():
+        kwargs = dict([(k, new_obj.tensor_from_layer(v)) for k,v in list(kwargs.items())])
+        for (k,v) in list(kwargs.items()):
             o_kwargs[k] = v
         new_obj.prev_args = (o_args, o_kwargs)
         new_obj.get_grads(*o_args, **o_kwargs)
@@ -440,8 +440,8 @@ class Layer(Container):
             o_args, o_kwargs = new_obj.prev_args
         except:
             o_args, o_kwargs = ([], {})
-        kwargs = dict([(k, new_obj.tensor_from_layer(v)) for k,v in kwargs.items()])
-        for (k,v) in kwargs.items():
+        kwargs = dict([(k, new_obj.tensor_from_layer(v)) for k,v in list(kwargs.items())])
+        for (k,v) in list(kwargs.items()):
             o_kwargs[k] = v
         new_obj.prev_args = (o_args, o_kwargs)
         sample = new_obj.compute_sample(*o_args, **o_kwargs)
@@ -456,7 +456,7 @@ class Layer(Container):
             del kwargs['one_step']
             args = [self.tensor_from_layer(arg, False) for arg in args]
             kwargs = dict([(k, self.tensor_from_layer(v, False))
-                           for k,v in kwargs.items()])
+                           for k,v in list(kwargs.items())])
             if hasattr(self, 'step_fprop'):
                 return self.step_fprop(*args, **kwargs)
             else:
@@ -464,7 +464,7 @@ class Layer(Container):
         new_obj = utils.copy(self)
 
         args = [new_obj.tensor_from_layer(arg) for arg in args]
-        kwargs = dict([(k, new_obj.tensor_from_layer(v)) for k,v in kwargs.items()])
+        kwargs = dict([(k, new_obj.tensor_from_layer(v)) for k,v in list(kwargs.items())])
         if 'do' in kwargs:
             kind = kwargs['do']
             del kwargs['do']
@@ -532,9 +532,9 @@ class Model(Container):
     def clone(**new_inputs):
         new_obj = utils.copy(self)
         # Reorder inputs
-        assert len(new_obj.inputs) == len(new_inputs.items())
+        assert len(new_obj.inputs) == len(list(new_inputs.items()))
         pairs=[(x, new_inputs[x.name]) for x in inputs]
-        new_obj.inputs = new_inputs.values()
+        new_obj.inputs = list(new_inputs.values())
         new_obj.out = theano.clone(new_obj.out, replace=pairs)
         if hasattr(new_obj, 'cost'):
             new_obj.cost = theano.clone(new_obj.cost, replace=pairs)

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
-import cPickle
+import pickle
 import traceback
 import logging
 import time
@@ -50,7 +50,7 @@ class BeamSearch(object):
 
     def search(self, seq, n_samples, ignore_unk=False, minlen=1):
         c = self.comp_repr(seq)[0]
-        states = map(lambda x : x[None, :], self.comp_init_states(c))
+        states = [x[None, :] for x in self.comp_init_states(c)]
         dim = states[0].shape[1]
         # added by Zhaopeng Tu, 2015-11-02
         if self.enc_dec.state['maintain_coverage']:
@@ -85,7 +85,7 @@ class BeamSearch(object):
             # Compute probabilities of the next words for
             # all the elements of the beam.
             beam_size = len(trans)
-            last_words = (numpy.array(map(lambda t : t[-1], trans))
+            last_words = (numpy.array([t[-1] for t in trans])
                     if k > 0
                     else numpy.zeros(beam_size, dtype="int64"))
             results = self.comp_next_probs(c, k, last_words, *states, coverage_before=coverages, fertility=fertility)
@@ -159,11 +159,11 @@ class BeamSearch(object):
                     fin_costs.append(new_costs[i])
                     if self.enc_dec.state['maintain_coverage']:
                         fin_coverages.append(new_coverages[:,i,0])
-            states = map(lambda x : x[indices], new_states)
+            states = [x[indices] for x in new_states]
 
             if self.enc_dec.state['maintain_coverage']:
                 coverages = numpy.zeros((c.shape[0], n_samples, coverage_dim), dtype='float32')
-                for i in xrange(n_samples):
+                for i in range(n_samples):
                     coverages[:,i,:] = new_coverages[:, indices[i], :]
 
         # Dirty tricks to obtain any translation
@@ -198,7 +198,7 @@ class BeamSearch(object):
 
 def indices_to_words(i2w, seq):
     sen = []
-    for k in xrange(len(seq)):
+    for k in range(len(seq)):
         if i2w[seq[k]] == '<eol>':
             break
         sen.append(i2w[seq[k]])
@@ -228,7 +228,7 @@ def sample(lm_model, seq, n_samples,
             sentences.append(" ".join(sen))
         for i in range(len(costs)):
             if verbose:
-                print "{}: {}".format(costs[i], sentences[i])
+                print("{}: {}".format(costs[i], sentences[i]))
         if lm_model.maintain_coverage:
             if lm_model.use_linguistic_coverage and lm_model.use_fertility_model:
                 return sentences, aligns, costs, coverages, fertility, trans
@@ -242,9 +242,9 @@ def sample(lm_model, seq, n_samples,
         costs = []
 
         values, cond_probs = sampler(n_samples, 3 * (len(seq) - 1), alpha, seq)
-        for sidx in xrange(n_samples):
+        for sidx in range(n_samples):
             sen = []
-            for k in xrange(values.shape[0]):
+            for k in range(values.shape[0]):
                 if lm_model.word_indxs[values[k, sidx]] == '<eol>':
                     break
                 sen.append(lm_model.word_indxs[values[k, sidx]])
@@ -259,8 +259,8 @@ def sample(lm_model, seq, n_samples,
         sprobs = numpy.argsort(costs)
         if verbose:
             for pidx in sprobs:
-                print "{}: {} {} {}".format(pidx, -costs[pidx], all_probs[pidx], sentences[pidx])
-            print
+                print("{}: {} {} {}".format(pidx, -costs[pidx], all_probs[pidx], sentences[pidx]))
+            print()
         return sentences, costs, None
     else:
         raise Exception("I don't know what to do")
@@ -300,7 +300,7 @@ def main():
 
     state = prototype_search_with_coverage_state()
     with open(args.state) as src:
-        state.update(cPickle.load(src))
+        state.update(pickle.load(src))
     state.update(eval("dict({})".format(args.changes)))
 
     logging.basicConfig(level=getattr(logging, state['level']), format="%(asctime)s: %(name)s: %(levelname)s: %(message)s")
@@ -310,7 +310,7 @@ def main():
     enc_dec.build()
     lm_model = enc_dec.create_lm_model()
     lm_model.load(args.model_path)
-    indx_word = cPickle.load(open(state['word_indx'],'rb'))
+    indx_word = pickle.load(open(state['word_indx'],'rb'))
 
     sampler = None
     beam_search = None
@@ -320,7 +320,7 @@ def main():
     else:
         sampler = enc_dec.create_sampler(many_samples=True)
 
-    idict_src = cPickle.load(open(state['indx_word'],'r'))
+    idict_src = pickle.load(open(state['indx_word'],'r'))
 
     if args.source and args.trans:
         # Actually only beam search is currently supported here
@@ -350,57 +350,57 @@ def main():
                         beam_search=beam_search, ignore_unk=args.ignore_unk, normalize=args.normalize)
             
             if args.verbose:
-                print "Parsed Input:", parsed_in
+                print("Parsed Input:", parsed_in)
 
             if len(trans) == 0:
                 trans = ['Failed']
                 costs = [0.0]
 
             best = numpy.argmin(costs)
-            print >>ftrans, trans[best]
+            print(trans[best], file=ftrans)
             if args.verbose:
-                print "Translation:", trans[best]
-                print "Aligns:"
+                print("Translation:", trans[best])
+                print("Aligns:")
                 # aligns shape:  (target_len, source_len)
                 # we reverse it to the shape (source_len, target_len) to show the matrix
-                print numpy.array(aligns[best]).transpose().tolist()
+                print(numpy.array(aligns[best]).transpose().tolist())
 
                 if lm_model.maintain_coverage:
                     # since we filtered <eos> from trans[best], thus the index adds 1
                     coverage = coverages[best]
-                    print "Coverage:", 
+                    print("Coverage:", end=' ') 
                     words = parsed_in.split()
-                    for k in xrange(len(words)):
-                        print '%s/%.2f'%(words[k], coverage[k]),
-                    print ''
+                    for k in range(len(words)):
+                        print('%s/%.2f'%(words[k], coverage[k]), end=' ')
+                    print('')
                     if lm_model.use_linguistic_coverage and lm_model.use_fertility_model:
-                        print 'Fertility:  ',
-                        for k in xrange(len(words)):
-                            print '%s/%.2f'%(words[k], fertility[k]),
-                        print ''
-                print 
+                        print('Fertility:  ', end=' ')
+                        for k in range(len(words)):
+                            print('%s/%.2f'%(words[k], fertility[k]), end=' ')
+                        print('')
+                print() 
 
             total_cost += costs[best]
             if (i + 1)  % 100 == 0:
                 ftrans.flush()
                 logger.debug("Current speed is {} per sentence".
                         format((time.time() - start_time) / (i + 1)))
-        print "Total cost of the translations: {}".format(total_cost)
+        print("Total cost of the translations: {}".format(total_cost))
 
         fsrc.close()
         ftrans.close()
     else:
         while True:
             try:
-                seqin = raw_input('Input Sequence: ')
-                n_samples = int(raw_input('How many samples? '))
+                seqin = input('Input Sequence: ')
+                n_samples = int(input('How many samples? '))
                 alpha = None
                 if not args.beam_search:
-                    alpha = float(raw_input('Inverse Temperature? '))
+                    alpha = float(input('Inverse Temperature? '))
                 seq,parsed_in = parse_input(state, indx_word, seqin, idx2word=idict_src)
-                print "Parsed Input:", parsed_in
+                print("Parsed Input:", parsed_in)
             except Exception:
-                print "Exception while parsing your input:"
+                print("Exception while parsing your input:")
                 traceback.print_exc()
                 continue
 

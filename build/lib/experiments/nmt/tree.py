@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
-import cPickle
+import pickle
 import traceback
 import logging
 import time
@@ -37,7 +37,7 @@ class Timer(object):
 
 def indices_to_words(i2w, seq):
     sen = []
-    for k in xrange(len(seq)):
+    for k in range(len(seq)):
         if i2w[seq[k]] == '<eol>':
             break
         sen.append(i2w[seq[k]])
@@ -57,7 +57,7 @@ def main():
     state = getattr(experiments.nmt, args.state_fn)()
     if hasattr(args, 'state') and args.state:
         with open(args.state) as src:
-            state.update(cPickle.load(src))
+            state.update(pickle.load(src))
     state.update(eval("dict({})".format(args.changes)))
 
     assert state['enc_rec_layer'] == "RecursiveConvolutionalLayer", "Only works with gated recursive convolutional encoder"
@@ -70,8 +70,8 @@ def main():
     lm_model = enc_dec.create_lm_model()
     lm_model.load(args.model_path)
 
-    indx_word = cPickle.load(open(state['word_indx'],'rb'))
-    idict_src = cPickle.load(open(state['indx_word'],'r'))
+    indx_word = pickle.load(open(state['word_indx'],'rb'))
+    idict_src = pickle.load(open(state['indx_word'],'r'))
 
     x = TT.lvector()
     h = TT.tensor3()
@@ -84,11 +84,11 @@ def main():
 
     while True:
         try:
-            seqin = raw_input('Input Sequence: ')
+            seqin = input('Input Sequence: ')
             seq,parsed_in = parse_input(state, indx_word, seqin, idx2word=idict_src)
-            print "Parsed Input:", parsed_in
+            print("Parsed Input:", parsed_in)
         except Exception:
-            print "Exception while parsing your input:"
+            print("Exception while parsing your input:")
             traceback.print_exc()
             continue
 
@@ -121,13 +121,13 @@ def main():
         node_idx = len(seq) - 1
 
         vpos += 6
-        for dd in xrange(len(seq)-1):
+        for dd in range(len(seq)-1):
             new_h, gater = step_up(new_h)
             decisions = numpy.argmax(gater, -1)
             new_nodes_level = numpy.zeros(len(seq) - (dd+1))
             hpos = float(len(seq)+1) - 0.5 * (dd+1)
             last_node = True
-            for nn in xrange(len(seq)-(dd+1)):
+            for nn in range(len(seq)-(dd+1)):
                 hpos -= 1
                 if not last_node:
                     # merge nodes
@@ -156,11 +156,11 @@ def main():
             vpos += 12
 
         # TODO: Show only strong edges.
-        threshold = float(raw_input('Threshold: '))
+        threshold = float(input('Threshold: '))
         edges = [(u,v,d) for (u,v,d) in G.edges(data=True) if d['weight'] > threshold]
         #edges = G.edges(data=True)
 
-        use_weighting = raw_input('Color according to weight [Y/N]: ')
+        use_weighting = input('Color according to weight [Y/N]: ')
         if use_weighting == 'Y':
             cm = plt.get_cmap('binary') 
             cNorm  = colors.Normalize(vmin=0., vmax=1.)
@@ -175,7 +175,7 @@ def main():
         nx.draw_networkx_edges(G, pos=nodes_pos, edge_color=colorList, edgelist=edges)
         nx.draw_networkx_labels(G,pos=nodes_pos,labels=nodes_labels,font_family='sans-serif')
         plt.axis('off')
-        figname = raw_input('Save to: ')
+        figname = input('Save to: ')
         if figname[-3:] == "pdf":
             plt.savefig(figname, type='pdf')
         else:

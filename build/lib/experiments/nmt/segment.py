@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # coding=<utf-8>
-from __future__ import print_function
+
 
 import os
 import sys
 import argparse
-import cPickle
+import pickle
 import traceback
 import logging
 import numpy
 import time
-from itertools import izip, product
+from itertools import product
 from experiments.nmt import RNNEncoderDecoder, prototype_state, parse_input, create_padded_batch
 from experiments.nmt.sample import BeamSearch
 from experiments.nmt.sample import sample as sample_func
@@ -34,13 +34,13 @@ def get_models():
     state_en2fr = prototype_state()
     if hasattr(args, 'state_en2fr'):
         with open(args.state_en2fr) as src:
-            state_en2fr.update(cPickle.load(src))
+            state_en2fr.update(pickle.load(src))
     state_en2fr.update(eval("dict({})".format(args.changes)))
 
     state_fr2en = prototype_state()
     if hasattr(args, 'state_fr2en') and args.state_fr2en is not None:
         with open(args.state_fr2en) as src:
-            state_fr2en.update(cPickle.load(src))
+            state_fr2en.update(pickle.load(src))
     state_fr2en.update(eval("dict({})".format(args.changes)))
 
     rng = numpy.random.RandomState(state_en2fr['seed'])
@@ -48,8 +48,8 @@ def get_models():
     enc_dec_en_2_fr.build()
     lm_model_en_2_fr = enc_dec_en_2_fr.create_lm_model()
     lm_model_en_2_fr.load(args.model_path_en2fr)
-    indx_word_src = cPickle.load(open(state_en2fr['word_indx'],'rb'))
-    indx_word_trgt = cPickle.load(open(state_en2fr['word_indx_trgt'], 'rb'))
+    indx_word_src = pickle.load(open(state_en2fr['word_indx'],'rb'))
+    indx_word_trgt = pickle.load(open(state_en2fr['word_indx_trgt'], 'rb'))
 
     if hasattr(args, 'state_fr2en') and args.state_fr2en is not None:
         rng = numpy.random.RandomState(state_fr2en['seed'])
@@ -68,7 +68,7 @@ def chunks(l, n):
     """
     Yield successive n-sized chunks from l.
     """
-    for i in xrange(0, len(l), n):
+    for i in range(0, len(l), n):
         yield l[i:i+n]
 
 
@@ -115,12 +115,12 @@ def process_sentence(source_sentence, model, max_phrase_length, n_samples,
     #Create sorted phrase lists
     tiled_source_phrase_list = []
     index_order_list = []
-    for i in xrange(n_s):
+    for i in range(n_s):
         for j in numpy.arange(i, min(i+max_phrase_length, n_s)):
                     index_order_list.append([i, j])
 
     logger.debug("sorting list")
-    index_order_list.sort(key=lambda (i, j): (j - i))
+    index_order_list.sort(key=lambda i_j: (i_j[1] - i_j[0]))
 
     logger.debug("creating phrase lists")
     if add_period:
@@ -137,7 +137,7 @@ def process_sentence(source_sentence, model, max_phrase_length, n_samples,
     score_dict = {}
     trans = {}
 
-    for phrase_idx in xrange(0, len(index_order_list)):
+    for phrase_idx in range(0, len(index_order_list)):
         logger.debug("{0} out of {1}".format(phrase_idx, len(index_order_list)))
         i, j = index_order_list[phrase_idx]
         logger.debug("Translating phrase : {}".format(" ".join(source_sentence.strip().split()[i:j+1])))
@@ -181,7 +181,7 @@ def process_sentence(source_sentence, model, max_phrase_length, n_samples,
     #Remove the period at the end if not last word
     #Lower case first word if not first word
     if add_period:
-       for phrase_idx in xrange(0, len(index_order_list)):
+       for phrase_idx in range(0, len(index_order_list)):
            i, j = index_order_list[phrase_idx]
            if i != 0:
                trans[i, j] = " ".join([trans[i,j][0].lower()] + [trans[i,j][1:]])
@@ -244,11 +244,11 @@ def sample_targets(input_phrase, model, n_samples, reverse_score, normalize):
                                           numpy.atleast_2d(x_mask),
                                           numpy.atleast_2d(y_mask))[0]
 
-        for index in xrange(len(scores)):
+        for index in range(len(scores)):
             scores[index] = (scores[index] + reverse_scores[index]) / 2.
 
     else:
-        for index in xrange(len(scores)):
+        for index in range(len(scores)):
             scores[index] = scores[index]
 
     trans = trans[numpy.argmin(scores)]
@@ -290,8 +290,8 @@ def find_align(source, model, max_phrase_length, n_samples,
     best_choice = -1 * numpy.ones(n_s+1, dtype="int64")
     best_choice[0] = 0
 
-    for i in xrange(1, n_s+1):
-        for j in xrange(max(0, i-max_phrase_length), i):
+    for i in range(1, n_s+1):
+        for j in range(max(0, i-max_phrase_length), i):
             cand_cost = prefix_score[j] + scores[j, i-1]
             if cand_cost < prefix_score[i]:
                 prefix_score[i] = cand_cost
@@ -320,7 +320,7 @@ def find_align(source, model, max_phrase_length, n_samples,
             value = phrases[i, j]
             T.append(value)
             segmented_target.append([phrases[i,j]])
-            segmented_source.append([split_source_sentence[k] for k in xrange(i, j+1)])
+            segmented_source.append([split_source_sentence[k] for k in range(i, j+1)])
 
     print("Input sentence: ", source, file=f_total)
     print("Segmentation: ", segmented_source, file=f_total)

@@ -4,7 +4,7 @@ import sys
 
 if __name__ == "__main__" :
     if (len(sys.argv) != 5) :
-        print >> sys.stderr, "exe in_src_plain in_ref_plain out_src_sgm out_ref_sgm"
+        print("exe in_src_plain in_ref_plain out_src_sgm out_ref_sgm", file=sys.stderr)
         sys.exit(0)
 
     fin_src_plain = open(sys.argv[1])
@@ -39,18 +39,18 @@ if __name__ == "__main__" :
 
 
     # write source sgm file
-    print >> fout_src_sgm, '<srcset setid="funny" srclang="Chinese" trglang="English">\n<doc docid="document">'
-    for id in xrange(len(parallel_list)):
-        print >> fout_src_sgm, '<seg id=%d>%s</seg>' % (id, parallel_list[id][0])
-    print >> fout_src_sgm, '</doc>\n</srcset>'
+    print('<srcset setid="funny" srclang="Chinese" trglang="English">\n<doc docid="document">', file=fout_src_sgm)
+    for id in range(len(parallel_list)):
+        print('<seg id=%d>%s</seg>' % (id, parallel_list[id][0]), file=fout_src_sgm)
+    print('</doc>\n</srcset>', file=fout_src_sgm)
 
 
     # write reference sgm file
-    print >> fout_ref_sgm, '<refset setid="funny-ref" srclang="Chinese" trglang="English">'
+    print('<refset setid="funny-ref" srclang="Chinese" trglang="English">', file=fout_ref_sgm)
     ref_num = len(refs)
-    for sysid in xrange(ref_num):
-        print >> fout_ref_sgm, '<doc docid="document" sysid="r%d">'%(sysid)
-        for id in xrange(len(parallel_list)):
-            print >> fout_ref_sgm, '<seg id=%d>%s</seg>' % (id, parallel_list[id][1][sysid])
-        print >> fout_ref_sgm, '</doc>'
-    print >> fout_ref_sgm, '</refset>'
+    for sysid in range(ref_num):
+        print('<doc docid="document" sysid="r%d">'%(sysid), file=fout_ref_sgm)
+        for id in range(len(parallel_list)):
+            print('<seg id=%d>%s</seg>' % (id, parallel_list[id][1][sysid]), file=fout_ref_sgm)
+        print('</doc>', file=fout_ref_sgm)
+    print('</refset>', file=fout_ref_sgm)

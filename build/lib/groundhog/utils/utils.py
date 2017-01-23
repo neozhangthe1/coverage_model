@@ -17,6 +17,7 @@ import copy as pycopy
 
 import theano
 import theano.tensor as TT
+from functools import reduce
 
 def print_time(secs):
     if secs < 120.:
@@ -34,13 +35,13 @@ def print_mem(context=None):
         # Total memory in Mb
         total = float(rvals[1]) / 1024. / 1024.
         if context == None:
-            print ('Used %.3f Mb Free  %.3f Mb, total %.3f Mb' %
-                   (total - available, available, total))
+            print(('Used %.3f Mb Free  %.3f Mb, total %.3f Mb' %
+                   (total - available, available, total)))
         else:
             info = str(context)
-            print (('GPU status : Used %.3f Mb Free %.3f Mb,'
+            print((('GPU status : Used %.3f Mb Free %.3f Mb,'
                     'total %.3f Mb [context %s]') %
-                    (total - available, available, total, info))
+                    (total - available, available, total, info)))
 
 def const(value):
     return TT.constant(numpy.asarray(value, dtype=theano.config.floatX))
@@ -94,7 +95,7 @@ def sample_weights(sizeX, sizeY, sparsity, scale, rng):
     sizeY = int(sizeY)
     sparsity = numpy.minimum(sizeY, sparsity)
     values = numpy.zeros((sizeX, sizeY), dtype=theano.config.floatX)
-    for dx in xrange(sizeX):
+    for dx in range(sizeX):
         perm = rng.permutation(sizeY)
         new_vals = rng.uniform(low=-scale, high=scale, size=(sparsity,))
         vals_norm = numpy.sqrt((new_vals**2).sum())
@@ -113,7 +114,7 @@ def sample_weights_classic(sizeX, sizeY, sparsity, scale, rng):
         sparsity = numpy.minimum(sizeY, sparsity)
     sparsity = numpy.minimum(sizeY, sparsity)
     values = numpy.zeros((sizeX, sizeY), dtype=theano.config.floatX)
-    for dx in xrange(sizeX):
+    for dx in range(sizeX):
         perm = rng.permutation(sizeY)
         new_vals = rng.normal(loc=0, scale=scale, size=(sparsity,))
         values[dx, perm[:sparsity]] = new_vals
@@ -130,7 +131,7 @@ def sample_weights_orth(sizeX, sizeY, sparsity, scale, rng):
     else:
         sparsity = numpy.minimum(sizeY, sparsity)
     values = numpy.zeros((sizeX, sizeY), dtype=theano.config.floatX)
-    for dx in xrange(sizeX):
+    for dx in range(sizeX):
         perm = rng.permutation(sizeY)
         new_vals = rng.normal(loc=0, scale=scale, size=(sparsity,))
         values[dx, perm[:sparsity]] = new_vals
@@ -144,7 +145,7 @@ def init_bias(size, scale, rng):
     return numpy.ones((size,), dtype=theano.config.floatX)*scale
 
 def id_generator(size=5, chars=string.ascii_uppercase + string.digits):
-    return ''.join(random.choice(chars) for i in xrange(size))
+    return ''.join(random.choice(chars) for i in range(size))
 
 def constant_shape(shape):
     return lambda *args, **kwargs : shape
@@ -154,8 +155,8 @@ def binVec2Int(binVec):
     return reduce(add,
                   [int(x) * 2 ** y
                    for x, y in zip(
-                       list(binVec),range(len(binVec) - 1, -1,
-                                                       -1))])
+                       list(binVec),list(range(len(binVec) - 1, -1,
+                                                       -1)))])
 
 def Int2binVec(val, nbits=10):
     strVal = '{0:b}'.format(val)

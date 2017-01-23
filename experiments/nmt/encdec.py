@@ -70,7 +70,7 @@ def create_padded_batch(state, x, y, return_dict=False):
     Ymask = numpy.zeros((my, n), dtype='float32')
 
     # Fill X and Xmask
-    for idx in xrange(len(x[0])):
+    for idx in range(len(x[0])):
         # Insert sequence idx in a column of matrix X
         if mx < len(x[0][idx]):
             X[:mx, idx] = x[0][idx][:mx]
@@ -88,7 +88,7 @@ def create_padded_batch(state, x, y, return_dict=False):
             Xmask[len(x[0][idx]), idx] = 1.
 
     # Fill Y and Ymask in the same way as X and Xmask in the previous loop
-    for idx in xrange(len(y[0])):
+    for idx in range(len(y[0])):
         Y[:len(y[0][idx]), idx] = y[0][idx][:my]
         if len(y[0][idx]) < my:
             Y[len(y[0][idx]):, idx] = state['null_sym_target']
@@ -102,7 +102,7 @@ def create_padded_batch(state, x, y, return_dict=False):
     # - either source sequence or target sequence is non-empty
     # - source sequence and target sequence have null_sym ending
     # Why did not we filter them earlier?
-    for idx in xrange(X.shape[1]):
+    for idx in range(X.shape[1]):
         if numpy.sum(Xmask[:,idx]) == 0 and numpy.sum(Ymask[:,idx]) == 0:
             null_inputs[idx] = 1
         if Xmask[-1,idx] and X[-1,idx] != state['null_sym_source']:
@@ -143,9 +143,9 @@ def get_batch_iterator(state):
                 k_batches = state['sort_k_batches']
                 batch_size = state['bs']
                 data = [PytablesBitextIterator.next(self) for k in range(k_batches)]
-                x = numpy.asarray(list(itertools.chain(*map(operator.itemgetter(0), data))))
-                y = numpy.asarray(list(itertools.chain(*map(operator.itemgetter(1), data))))
-                lens = numpy.asarray([map(len, x), map(len, y)])
+                x = numpy.asarray(list(itertools.chain(*list(map(operator.itemgetter(0), data)))))
+                y = numpy.asarray(list(itertools.chain(*list(map(operator.itemgetter(1), data)))))
+                lens = numpy.asarray([list(map(len, x)), list(map(len, y))])
                 order = numpy.argsort(lens.max(axis=0)) if state['sort_k_batches'] > 1 \
                         else numpy.arange(len(x))
                 for k in range(k_batches):
@@ -216,15 +216,15 @@ class RecurrentLayerWithSearch(Layer):
         assert weight_noise == False
         updater_activation = gater_activation
 
-        if type(init_fn) is str or type(init_fn) is unicode:
+        if type(init_fn) is str or type(init_fn) is str:
             init_fn = eval(init_fn)
-        if type(bias_fn) is str or type(bias_fn) is unicode:
+        if type(bias_fn) is str or type(bias_fn) is str:
             bias_fn = eval(bias_fn)
-        if type(activation) is str or type(activation) is unicode:
+        if type(activation) is str or type(activation) is str:
             activation = eval(activation)
-        if type(updater_activation) is str or type(updater_activation) is unicode:
+        if type(updater_activation) is str or type(updater_activation) is str:
             updater_activation = eval(updater_activation)
-        if type(reseter_activation) is str or type(reseter_activation) is unicode:
+        if type(reseter_activation) is str or type(reseter_activation) is str:
             reseter_activation = eval(reseter_activation)
         
         self.scale = scale
@@ -2036,7 +2036,7 @@ class RNNEncoderDecoder(object):
             def sampler(*args):
                 # squeeze: Remove broadcastable dimensions from the shape of an array.
                 # thus coverage downcasts from 3D to 2D, since the coverage_dim is 1
-                return map(lambda x : x.squeeze(), self.sample_fn(1, *args))
+                return [x.squeeze() for x in self.sample_fn(1, *args)]
             return sampler
         return self.sample_fn
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
-import cPickle
+import pickle
 import logging
 import pprint
 
@@ -40,13 +40,13 @@ class RandomSamplePrinter(object):
                     break
 
                 x, y = xs[:, seq_idx], ys[:, seq_idx]
-                x_words = cut_eol(map(lambda w_idx : self.model.word_indxs_src[w_idx], x))
-                y_words = cut_eol(map(lambda w_idx : self.model.word_indxs[w_idx], y))
+                x_words = cut_eol([self.model.word_indxs_src[w_idx] for w_idx in x])
+                y_words = cut_eol([self.model.word_indxs[w_idx] for w_idx in y])
                 if len(x_words) == 0:
                     continue
 
-                print "Input: {}".format(" ".join(x_words))
-                print "Target: {}".format(" ".join(y_words))
+                print("Input: {}".format(" ".join(x_words)))
+                print("Target: {}".format(" ".join(y_words)))
                 self.model.get_samples(self.state['seqlen'] + 1, self.state['n_samples'], x[:len(x_words)])
                 sample_idx += 1
 
@@ -69,7 +69,7 @@ def main():
             state.update(eval(open(args.state).read()))
         else:
             with open(args.state) as src:
-                state.update(cPickle.load(src))
+                state.update(pickle.load(src))
     for change in args.changes:
         state.update(eval("dict({})".format(change)))
 
