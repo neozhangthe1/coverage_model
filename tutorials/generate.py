@@ -7,7 +7,7 @@ Call :
     generate_word,py --help
 """
 from collections import Counter
-import ConfigParser
+import configparser
 import argparse
 import os
 import time
@@ -25,14 +25,14 @@ def construct_vocabulary(dataset, oov_rate, level):
         txt = txt.split(' ')
         txt = [x for x in txt if x != '']
     # Order the words
-    print ' .. sorting words'
-    all_items = Counter(txt).items()
+    print(' .. sorting words')
+    all_items = list(Counter(txt).items())
     no_end = [x for x in all_items if x[0] !='\n']
     freqs = [x for x in all_items if x[0] == '\n'] + \
             sorted(no_end,
                    key=lambda t: t[1],
                    reverse=True)
-    print ' .. shrinking the vocabulary size'
+    print(' .. shrinking the vocabulary size')
     # Decide length
     all_freq = float(sum([x[1] for x in freqs]))
     up_to = len(freqs)
@@ -46,7 +46,7 @@ def construct_vocabulary(dataset, oov_rate, level):
     up_to += 1
     freqs = freqs[:up_to]
     words = [x[0] for x in freqs]
-    return dict(zip(words, range(up_to))), [x[1]/all_freq for x in freqs],freqs
+    return dict(list(zip(words, list(range(up_to))))), [x[1]/all_freq for x in freqs],freqs
 
 
 def grab_text(path, filename, vocab, oov_default, dtype, level):
@@ -70,37 +70,37 @@ def grab_text(path, filename, vocab, oov_default, dtype, level):
 def main(parser):
     o = parser.parse_args()
     dataset = o.path
-    print 'Constructing the vocabulary ..'
+    print('Constructing the vocabulary ..')
     vocab, freqs, freq_wd = construct_vocabulary(dataset, o.oov_rate, o.level)
     vocab['<unk>'] = numpy.max(list(vocab.values()))+1
     
     oov_default = vocab["<unk>"]
-    print "EOL", vocab["\n"]
-    print 'Constructing train set'
+    print("EOL", vocab["\n"])
+    print('Constructing train set')
     train = grab_text(dataset, 'train', vocab, oov_default, o.dtype, o.level)
-    print 'Constructing valid set'
+    print('Constructing valid set')
     valid = grab_text(dataset, 'valid', vocab, oov_default, o.dtype, o.level)
-    print 'Constructing test set'
+    print('Constructing test set')
     test = grab_text(dataset, 'test', vocab, oov_default, o.dtype, o.level)
-    print 'Saving data'
+    print('Saving data')
 
     if o.level == 'words':
         data = {'train_words': train, 'valid_words': valid, 'test_words': test, 'n_words': len(vocab)}
     else:
         data = {'train_chars': train, 'valid_chars': valid, 'test_chars': test, 'n_chars': len(vocab)}
     keys = {'oov': oov_default, 'freqs': numpy.array(freqs), 'vocabulary': vocab, 'freq_wd': freq_wd}
-    all_keys = dict(keys.items() + data.items())
+    all_keys = dict(list(keys.items()) + list(data.items()))
     
     numpy.savez(o.dest, **all_keys)
-    inv_map = [None] * len(vocab.items())
-    for k, v in vocab.items():
+    inv_map = [None] * len(list(vocab.items()))
+    for k, v in list(vocab.items()):
         inv_map[v] = k
 
     if o.level == 'words':
         numpy.savez(o.dest+"_dict", unique_words=inv_map)
     else:
         numpy.savez(o.dest+"_dict", unique_chars=inv_map)
-    print '... Done'
+    print('... Done')
 
 
 def get_parser():
